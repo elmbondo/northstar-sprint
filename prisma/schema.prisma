@@ -1,0 +1,29 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Order {
+  id                Int      @id @default(autoincrement())
+  orderNumber       String   @unique
+  customerName      String
+  product           String
+  status            String
+  orderDate         String
+  estimatedDelivery String
+  lastUpdated       String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model SupportLog {
+  id          Int      @id @default(autoincrement())
+  eventType   String
+  orderNumber String?
+  timestamp   DateTime @default(now())
+  metadata    String?
+}
