@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Accessible outline-focus indicators */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible {
+    @apply outline-none ring-2 ring-brand-taupe ring-offset-2 ring-offset-brand-cream;
+  }
+}
+
+/* Premium micro-transitions */
+.transition-premium {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Input custom styles */
+.input-premium {
+  @apply w-full px-4 py-3 border border-brand-taupe/30 bg-white/70 text-brand-espresso rounded-sm font-sans focus:border-brand-espresso focus:ring-1 focus:ring-brand-espresso transition-all duration-200 outline-none;
+}
