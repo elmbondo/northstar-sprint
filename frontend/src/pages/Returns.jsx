@@ -1,104 +1,58 @@
-import React, { useMemo, useState } from 'react';
-import { RefreshCw, ArrowRight, CheckCircle2, Package, Clock3, BadgeHelp } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Package, RefreshCw, Loader2, ArrowRight } from 'lucide-react';
 import ErrorState from '../components/ErrorState.jsx';
 import LoadingState from '../components/LoadingState.jsx';
 
-const QUESTIONS = [
-  {
-    id: 'how-to-return',
-    question: 'How do I return an item?',
-    icon: Package,
-  },
-  {
-    id: 'eligibility',
-    question: 'Is my item eligible for return?',
-    icon: BadgeHelp,
-  },
-  {
-    id: 'refund-timing',
-    question: 'When will I receive my refund?',
-    icon: Clock3,
-  },
-];
-
-function AnswerPanel({ selectedQuestion, answer }) {
-  if (!selectedQuestion || !answer) return null;
-
-  return (
-    <div className="w-full max-w-2xl mx-auto bg-white border border-brand-taupe/15 p-8 sm:p-10 space-y-6">
-      <div className="flex items-start gap-4 pb-6 border-b border-brand-taupe/15">
-        <div className="w-10 h-10 shrink-0 bg-brand-creamDark flex items-center justify-center text-brand-espresso border border-brand-taupe/15">
-          <CheckCircle2 className="w-5 h-5 stroke-[1.4]" />
-        </div>
-        <div className="space-y-1">
-          <span className="block text-[10px] uppercase tracking-widest text-brand-espresso/50 font-bold">
-            Selected Question
-          </span>
-          <h2 className="font-serif text-2xl text-brand-espresso font-medium">
-            {selectedQuestion.question}
-          </h2>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <span className="block text-[10px] uppercase tracking-widest text-brand-espresso/50 font-bold">
-          Answer
-        </span>
-        <p className="font-sans text-sm sm:text-base text-brand-espresso/70 leading-relaxed">
-          {answer}
-        </p>
-      </div>
-
-      <div className="rounded-sm border border-brand-taupe/15 bg-brand-creamDark/50 p-4 text-xs text-brand-espresso/60 leading-relaxed">
-        This is a self-service policy response. If your case needs review, you can contact support for help.
-      </div>
-    </div>
-  );
-}
-
-export default function Returns({ onNavigate }) {
-  const [selectedId, setSelectedId] = useState('');
-  const [answer, setAnswer] = useState('');
+export default function Returns({ onNavigate, user }) {
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [returns, setReturns] = useState(null);
 
-  const selectedQuestion = useMemo(
-    () => QUESTIONS.find((item) => item.id === selectedId) || null,
-    [selectedId]
-  );
+  useEffect(() => {
+    if (user) {
+      // Automatically fetch returns for logged-in user
+      fetchReturns(null);
+    }
+  }, [user]);
 
-  const handleSelect = async (questionId) => {
-    setSelectedId(questionId);
+  const fetchReturns = async (emailToFetch) => {
     setLoading(true);
     setError('');
-    setAnswer('');
-
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
-    const endpoint = `${apiBaseUrl}/api/returns`;
-
+    
     try {
-      const response = await fetch(endpoint, {
+      const response = await fetch('/api/returns', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ questionId }),
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(emailToFetch ? { email: emailToFetch } : {}),
       });
 
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setError(data.message || 'We could not retrieve that returns policy response.');
-        return;
+      const contentType = response.headers.get('content-type');
+      let data = {};
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
       }
 
-      setAnswer(data.answer);
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch returns data.');
+      }
+
+      setReturns(data.returns || []);
     } catch (err) {
-      console.error('API connection failure:', err);
-      setError('A network error occurred. Please verify your connection or try again later.');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!email) {
+      setError('Please enter your email address.');
+      return;
+    }
+    fetchReturns(email);
   };
 
   return (
@@ -111,76 +65,105 @@ export default function Returns({ onNavigate }) {
           Returns & Refunds
         </h1>
         <p className="font-sans text-brand-espresso/60 text-sm sm:text-base leading-relaxed font-light">
-          Choose a common returns or refund question below to see the policy response instantly.
+          Track the status of your returned items and refunds.
         </p>
       </div>
 
-      <div className="space-y-8">
-        <div className="w-full max-w-2xl mx-auto bg-white border border-brand-taupe/15 p-6 sm:p-8 space-y-6">
-          <div className="space-y-2">
-            <h2 className="font-serif text-2xl text-brand-espresso font-medium">Select a question</h2>
-            <p className="font-sans text-xs text-brand-espresso/60 leading-relaxed">
-              These are the supported Returns/Refunds topics for this self-service experience.
-            </p>
-          </div>
+      <div className="w-full max-w-2xl mx-auto space-y-8">
+        {!user && !returns && !loading && (
+          <form onSubmit={handleSubmit} className="bg-white border border-brand-taupe/15 p-6 sm:p-8 space-y-6">
+            <div className="space-y-2">
+              <h2 className="font-serif text-2xl text-brand-espresso font-medium">Find Your Returns</h2>
+              <p className="font-sans text-sm text-brand-espresso/60">
+                Enter the email address associated with your order to view return and refund status.
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-[10px] uppercase tracking-widest text-brand-espresso/50 font-bold">
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="eleanor@example.com"
+                className="w-full bg-brand-cream/30 border border-brand-taupe/20 px-4 py-3 text-sm focus:outline-none focus:border-brand-taupe/50 focus:bg-white transition-premium"
+                required
+              />
+            </div>
 
-          <div className="grid gap-3">
-            {QUESTIONS.map((item) => {
-              const Icon = item.icon;
-              const isActive = selectedId === item.id;
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-xs">
+                {error}
+              </div>
+            )}
 
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => handleSelect(item.id)}
-                  className={`flex items-center justify-between gap-4 text-left border px-4 py-4 transition-premium ${
-                    isActive
-                      ? 'border-brand-espresso bg-brand-creamDark'
-                      : 'border-brand-taupe/15 bg-white hover:border-brand-taupe/40 hover:bg-brand-cream/40'
-                  }`}
-                >
-                  <span className="flex items-center gap-3 min-w-0">
-                    <span className="w-9 h-9 shrink-0 flex items-center justify-center border border-brand-taupe/15 bg-white text-brand-espresso">
-                      <Icon className="w-4 h-4 stroke-[1.5]" />
-                    </span>
-                    <span className="font-sans text-sm sm:text-base text-brand-espresso font-medium">
-                      {item.question}
-                    </span>
-                  </span>
-                  <ArrowRight className={`w-4 h-4 shrink-0 transition-transform ${isActive ? 'translate-x-0.5' : 'text-brand-espresso/35'}`} />
-                </button>
-              );
-            })}
-          </div>
-        </div>
+            <button
+              type="submit"
+              className="w-full bg-brand-espresso text-white py-3.5 text-xs tracking-widest uppercase font-semibold hover:bg-brand-espresso/90 transition-premium flex items-center justify-center gap-2"
+            >
+              View Returns <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
+        )}
 
         {loading && <LoadingState />}
 
-        {!loading && error && (
-          <div className="space-y-8">
-            <ErrorState message={error} onRetry={selectedId ? () => handleSelect(selectedId) : undefined} />
+        {user && error && !loading && (
+          <ErrorState message={error} onRetry={() => fetchReturns(null)} />
+        )}
+
+        {returns && !loading && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between border-b border-brand-taupe/15 pb-4">
+              <h2 className="font-serif text-2xl text-brand-espresso">Your Return History</h2>
+              {!user && (
+                <button 
+                  onClick={() => { setReturns(null); setEmail(''); }}
+                  className="text-xs tracking-widest uppercase text-brand-espresso/60 hover:text-brand-espresso border-b border-brand-espresso/20 pb-0.5"
+                >
+                  Change Email
+                </button>
+              )}
+            </div>
+
+            {returns.length === 0 ? (
+              <div className="bg-white border border-brand-taupe/15 p-12 text-center space-y-4">
+                <Package className="w-8 h-8 text-brand-espresso/30 mx-auto" />
+                <p className="text-brand-espresso/60 text-sm">No returns found for this account.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {returns.map((item, idx) => (
+                  <div key={idx} className="bg-white border border-brand-taupe/15 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <span className="block text-[10px] uppercase tracking-widest text-brand-espresso/50 font-bold">
+                        Order #{item.orderNumber}
+                      </span>
+                      <h3 className="font-serif text-lg text-brand-espresso">{item.productName}</h3>
+                      <p className="text-xs text-brand-espresso/60">Requested on: {item.requestDate}</p>
+                    </div>
+                    <div className="text-right space-y-1">
+                      <span className="inline-block px-3 py-1 bg-brand-creamDark border border-brand-taupe/15 text-[10px] uppercase tracking-widest font-semibold text-brand-espresso">
+                        {item.status}
+                      </span>
+                      <p className="text-xs text-brand-espresso/60">Refund: {item.refundAmount}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
-        {!loading && !error && answer && (
-          <AnswerPanel selectedQuestion={selectedQuestion} answer={answer} />
-        )}
-
-        {!loading && !error && !answer && (
-          <div className="w-full max-w-2xl mx-auto border border-dashed border-brand-taupe/25 bg-brand-cream/40 p-8 text-center">
-            <p className="font-sans text-sm text-brand-espresso/60 leading-relaxed">
-              Pick a question above to see the return or refund response.
-            </p>
-          </div>
-        )}
-
-        <div className="text-center pt-4">
+        <div className="text-center pt-8">
           <button
             onClick={() => onNavigate('contact')}
             className="text-xs uppercase tracking-widest font-semibold text-brand-espresso/60 hover:text-brand-espresso transition-colors duration-200 border-b border-brand-espresso/20 pb-0.5"
           >
-            Contact Support
+            Need help with a return?
           </button>
         </div>
       </div>
