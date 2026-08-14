@@ -42,9 +42,8 @@ The Returns & Refunds feature is designed as a smart, context-aware self-service
   - The backend queries the `returns` collection based solely on the provided email.
 
 - **Offline/Testing Fallback:**
-  - To support UI testing even when the database is empty (or if a newly created test account has no real returns), the backend has a dynamic fallback mechanism.
-  - If `returnsData.length === 0`, the backend automatically generates a dummy "Sample Support Order" return. This ensures developers and testers always see a fully functional UI instead of a blank "No returns found" screen.
-
+  - Originally, the backend injected dummy data if the database was completely empty to help developers test the UI.
+  - *Update:* To comply with QA testing requirements, this aggressive fallback has been removed. The system now strictly respects the database state—if a user (guest or signed-in) searches an email with no real returns, they will correctly see the "No returns found" empty state. Mock data is now only injected in the extreme event of a complete database connection failure for the primary test account (`eleanor@example.com`).
 ## 3. Database Interactions
 - **Support Logs:** Every time a user interacts with the Auth or Returns endpoints, a background process asynchronously writes a record to the `support_logs` collection. This allows Northstar customer service agents to see exactly what customers are doing in the portal (e.g., "Lookup by: eleanor@example.com").
 - **Seeding:** The `scripts/seed-mongo.js` file is configured to drop test users and returns data into the database to quickly spin up testing environments.

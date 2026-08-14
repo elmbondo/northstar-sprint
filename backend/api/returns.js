@@ -53,23 +53,13 @@ export default async function returnsHandler(req, res) {
       queryEmail = queryEmail.toLowerCase().trim();
     }
 
-    // Fallback Mock Data if database fails or is empty for testing
-    if (returnsData.length === 0) {
-      if (queryEmail === 'eleanor@example.com') {
-        returnsData = [
-          { orderNumber: 'NS1001', productName: 'Classic Leather Tote', status: 'Refund Processed', requestDate: '2026-08-10', refundAmount: '$145.00' },
-          { orderNumber: 'NS1005', productName: 'Silk Scarf', status: 'In Transit', requestDate: '2026-08-12', refundAmount: 'Pending ($45.00)' }
-        ];
-      } else if (queryEmail === 'julian@example.com') {
-        returnsData = [
-          { orderNumber: 'NS1002', productName: 'Cashmere Crewneck Sweater', status: 'Reviewing', requestDate: '2026-08-13', refundAmount: 'Pending ($120.00)' }
-        ];
-      } else {
-        // Generate a dynamic demo return for whatever email the user just signed up with
-        returnsData = [
-          { orderNumber: `NS${Math.floor(1000 + Math.random() * 9000)}`, productName: 'Sample Support Order', status: 'In Transit', requestDate: new Date().toISOString().split('T')[0], refundAmount: 'Pending ($99.00)' }
-        ];
-      }
+    // Fallback Mock Data if database fails completely (for offline UI demonstration)
+    if (returnsData.length === 0 && queryEmail === 'eleanor@example.com' && !clientPromise) {
+      // We only inject static mock data if the database is completely offline/unreachable
+      // and they are using the primary test account. Otherwise, we respect the empty database state.
+      returnsData = [
+        { orderNumber: 'NS1001', productName: 'Classic Leather Tote', status: 'Refund Processed', requestDate: '2026-08-10', refundAmount: '$145.00' }
+      ];
     }
 
     return res.status(200).json({ success: true, returns: returnsData, email: queryEmail });
