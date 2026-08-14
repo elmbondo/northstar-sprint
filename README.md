@@ -1,17 +1,27 @@
-# React + Vite
+# Northstar Support MVP
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project uses React + Vite on the frontend and Prisma-backed serverless API routes in `api/`.
 
-Currently, two official plugins are available:
+## Database
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The repo is now configured for SQLite through Prisma.
 
-## React Compiler
+Set `DATABASE_URL` to your SQLite database file in a local `.env` or `.env.local` file:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+DATABASE_URL="file:../dev.db"
+```
 
-## Expanding the ESLint configuration
+## Local setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-Environment successfully configured for local development.
+1. Copy `.env.example` to `.env.local`
+2. Fill in `DATABASE_URL` with `file:../dev.db`
+3. Run `npm install` if needed
+4. Run `npx prisma db push` to create the local SQLite database
+5. Run `npm run prisma:seed` to load the sample support data
+6. Start the app with `npm run dev`
+
+## Notes
+
+- The project does not use a separate Express backend. Backend logic lives in `api/*.js`.
+- `npm run dev:api` is available if you only want the local API server.

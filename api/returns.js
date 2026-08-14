@@ -1,8 +1,9 @@
-const RETURN_RESPONSES = {
-  'how-to-return': 'To return an item, start by selecting a supported return reason in this portal. Once your request is submitted, follow the instructions shown on-screen to package the item securely and send it back using the return method provided by support.',
-  'eligibility': 'Most items are eligible for return within 30 days of delivery as long as they are unused, in original condition, and include the original packaging. Final-sale items, worn items, and damaged goods caused by misuse are not eligible.',
-  'refund-timing': 'Approved refunds are typically issued within 5 to 10 business days after the returned item is received and inspected. The exact timing can vary depending on your payment provider.',
-};
+import { PrismaClient } from '@prisma/client';
+
+let prisma;
+if (process.env.DATABASE_URL) {
+  prisma = new PrismaClient();
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -26,18 +27,36 @@ export default async function handler(req, res) {
     });
   }
 
-  const answer = RETURN_RESPONSES[questionId];
-
-  if (!answer) {
-    return res.status(400).json({
+  if (!prisma) {
+    return res.status(500).json({
       success: false,
-      message: 'We do not have a predefined response for that returns question.',
+      message: 'Database connection is not available.',
     });
   }
 
-  return res.status(200).json({
-    success: true,
-    questionId,
-    answer,
-  });
+  try {
+    const record = await prisma.returnResponse.findUnique({
+      where: { questionId },
+    });
+
+    if (!record) {
+      return res.status(404).json({
+        success: false,
+        message: 'We do not have a predefined response for that returns question.',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      questionId: record.questionId,
+      question: record.question,
+      answer: record.answer,
+    });
+  } catch (error) {
+    console.error('Server error during returns lookup:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'An internal error occurred. Please try again later.',
+    });
+  }
 }
