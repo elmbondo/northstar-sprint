@@ -117,9 +117,13 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend server is running' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
-  console.log(`📝 API endpoints: GET/POST /api/orders, GET/POST /api/logs`);
-  console.log(`❤️  Health check: GET /health`);
-});
+// Start server only if not in production (Vercel Serverless Function compatibility)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+    console.log(`📝 API endpoints: GET/POST /api/orders, GET/POST /api/logs`);
+    console.log(`❤️  Health check: GET /health`);
+  });
+}
+
+export default app;
