@@ -1,31 +1,19 @@
 {
-  "name": "northstar-support-mvp",
-  "private": true,
+  "name": "northstar-sprinter-monorepo",
   "version": "1.0.0",
-  "type": "module",
+  "description": "Northstar Retail Co. Support MVP - Full-stack monorepo",
+  "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "prisma:generate": "prisma generate",
-    "prisma:seed": "node prisma/seed.js"
+    "install-all": "pnpm install --recursive",
+    "dev": "pnpm --parallel -r run dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "build": "pnpm --filter frontend build",
+    "seed": "pnpm --filter backend run db:seed",
+    "start:backend": "pnpm --filter backend start"
   },
-  "dependencies": {
-    "@prisma/client": "^5.18.0",
-    "lucide-react": "^0.428.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.41",
-    "prisma": "^5.18.0",
-    "tailwindcss": "^3.4.10",
-    "vercel": "^58.10.0",
-    "vite": "^5.4.1"
-  },
-  "prisma": {
-    "seed": "node prisma/seed.js"
-  }
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
 }
