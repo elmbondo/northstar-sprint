@@ -6,7 +6,29 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    dependencies:
+      bcryptjs:
+        specifier: ^3.0.3
+        version: 3.0.3
+      connect-mongo:
+        specifier: ^6.0.0
+        version: 6.0.0(express-session@1.19.0)(mongodb@6.21.0)
+      cors:
+        specifier: ^2.8.5
+        version: 2.8.6
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.6.1
+      express:
+        specifier: ^4.18.2
+        version: 4.22.2
+      express-session:
+        specifier: ^1.19.0
+        version: 1.19.0
+      mongodb:
+        specifier: ^6.8.0
+        version: 6.21.0
 
   backend:
     dependencies:
