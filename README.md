@@ -45,7 +45,7 @@ Based on the original Northstar Sprint assignment sheet and ongoing responsibili
 ### 3. Returns & Refunds
 1. Customer navigates to Returns & Refunds.
 2. **Authenticated Flow:** If logged in, the system automatically pulls their email from the secure session and fetches their active returns flawlessly with zero friction.
-3. **Guest Flow:** If logged out, the user is prompted to enter an email address. The system retrieves associated returns based on the email provided.
+3. **Guest Flow:** If logged out, the user is prompted to enter an email address. The system retrieves associated returns based on the email provided. *(Note: You can test this using the seeded demo email `eleanor@example.com` or `julian@example.com`)*
 4. Frontend displays real-time return/refund statuses (e.g., "Refund Processed", "In Transit").
 
 ---
@@ -54,8 +54,8 @@ Based on the original Northstar Sprint assignment sheet and ongoing responsibili
 
 ### Customer Support
 - **Support Homepage:** Centralized hub for customer needs.
-- **Order Status Lookup:** Real-time visibility into mock orders.
-- **Returns & Refunds Hub:** Self-service tracking of return requests.
+- **Order Status Lookup:** Real-time visibility into mock orders (Test with: `NS1001`).
+- **Returns & Refunds Hub:** Self-service tracking of return requests (Test with: `eleanor@example.com`).
 - **Escalation:** Clear UI pathways to contact human support if self-service fails.
 
 ### Authentication
