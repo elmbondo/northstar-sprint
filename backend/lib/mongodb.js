@@ -19,21 +19,10 @@ const uri = process.env.MONGODB_URI;
 let client;
 let clientPromise;
 
-const options = {
-  tls: true,
-  tlsAllowInvalidCertificates: true,
-  family: 4,
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-};
-
 if (uri) {
   if (process.env.NODE_ENV === 'development') {
     if (!global._mongoClientPromise) {
-      client = new MongoClient(uri, options);
+      client = new MongoClient(uri);
       global._mongoClientPromise = client.connect().catch(err => {
         console.error('MongoDB Connection Error:', err.message);
         return null;
@@ -41,7 +30,7 @@ if (uri) {
     }
     clientPromise = global._mongoClientPromise;
   } else {
-    client = new MongoClient(uri, options);
+    client = new MongoClient(uri);
     clientPromise = client.connect().catch(err => {
       console.error('MongoDB Connection Error:', err.message);
       return null;

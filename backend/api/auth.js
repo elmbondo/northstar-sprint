@@ -100,6 +100,9 @@ export async function handleMe(req, res) {
 
   try {
     const client = await clientPromise;
+    if (!client) {
+      return res.status(503).json({ success: false, message: 'Database service unavailable.' });
+    }
     const db = client.db();
     
     const user = await db.collection('users').findOne({ _id: new ObjectId(req.session.userId) });

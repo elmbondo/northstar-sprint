@@ -56,6 +56,12 @@ export default async function ordersHandler(req, res) {
     }
 
     const client = await clientPromise;
+    if (!client) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database service unavailable. Please verify MONGODB_URI on Vercel.'
+      });
+    }
     const db = client.db();
     const orderRecord = await db.collection('orders').findOne({ orderNumber });
 

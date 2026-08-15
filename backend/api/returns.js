@@ -17,6 +17,9 @@ export default async function returnsHandler(req, res) {
 
     try {
       const client = await clientPromise;
+      if (!client) {
+        throw new Error('Database connection returned null');
+      }
       const db = client.db();
       
       // Prioritize authenticated user's email if logged in
