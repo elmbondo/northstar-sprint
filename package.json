@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Northstar Retail Co. Support MVP - Full-stack monorepo",
   "private": true,
+  "type": "module",
   "scripts": {
     "install-all": "pnpm install --recursive",
     "dev": "pnpm --parallel -r run dev",
