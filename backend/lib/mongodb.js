@@ -14,11 +14,14 @@ const __dirname = dirname(__filename);
 
 dotenv.config({ path: resolve(__dirname, '..', '.env') });
 
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/northstar_sprint';
+const uri = process.env.MONGODB_URI;
+
+let client;
+let clientPromise;
 
 const options = {
   tls: true,
-  tlsAllowInvalidCertificates: true, // Bypass strict local certificate issues
+  tlsAllowInvalidCertificates: true,
   family: 4,
   serverApi: {
     version: ServerApiVersion.v1,
@@ -27,15 +30,26 @@ const options = {
   }
 };
 
-if (process.env.NODE_ENV === 'development') {
-  if (!global._mongoClientPromise) {
+if (uri) {
+  if (process.env.NODE_ENV === 'development') {
+    if (!global._mongoClientPromise) {
+      client = new MongoClient(uri, options);
+      global._mongoClientPromise = client.connect().catch(err => {
+        console.error('MongoDB Connection Error:', err.message);
+        return null;
+      });
+    }
+    clientPromise = global._mongoClientPromise;
+  } else {
     client = new MongoClient(uri, options);
-    global._mongoClientPromise = Promise.resolve().then(() => client.connect());
+    clientPromise = client.connect().catch(err => {
+      console.error('MongoDB Connection Error:', err.message);
+      return null;
+    });
   }
-  clientPromise = global._mongoClientPromise;
 } else {
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
+  console.warn('MONGODB_URI environment variable is missing.');
+  clientPromise = Promise.resolve(null);
 }
 
 export default clientPromise;

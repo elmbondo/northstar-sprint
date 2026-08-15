@@ -35,15 +35,19 @@ app.use(cors({
 import clientPromise from './lib/mongodb.js';
 
 // Session configuration
+const sessionStore = process.env.MONGODB_URI
+  ? MongoStore.create({
+      clientPromise: clientPromise,
+      collectionName: 'sessions',
+      autoRemove: 'native'
+    })
+  : undefined;
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'northstar-super-secret-key-12345',
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({
-    clientPromise: clientPromise,
-    collectionName: 'sessions',
-    autoRemove: 'native'
-  }),
+  store: sessionStore,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24, // 1 day
     httpOnly: true,
