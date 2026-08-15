@@ -76,8 +76,8 @@ The application is built using a modern decoupled architecture inside a monorepo
 ```mermaid
 flowchart TD
     A[Customer Browser] --> B[React/Vite Frontend]
-    B -->|fetch() API Calls| C[Express Serverless API]
-    C -->|Mongoose/Driver queries| D[(MongoDB Atlas)]
+    B -->|"fetch() API Calls"| C[Express Serverless API]
+    C -->|"Mongoose/Driver queries"| D[(MongoDB Atlas)]
     D --> C
     C --> B
     B --> A
