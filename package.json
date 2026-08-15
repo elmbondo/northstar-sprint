@@ -8,7 +8,7 @@
     "dev": "pnpm --parallel -r run dev",
     "dev:frontend": "pnpm --filter frontend dev",
     "dev:backend": "pnpm --filter backend dev",
-    "build": "pnpm --filter frontend build && cp -r frontend/dist ./dist",
+    "build": "pnpm --filter frontend build && rm -rf ./dist && cp -r frontend/dist ./dist",
     "seed": "pnpm --filter backend run db:seed",
     "start:backend": "pnpm --filter backend start"
   },
