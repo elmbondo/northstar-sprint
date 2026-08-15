@@ -1,6 +1,8 @@
-import dns from 'dns';
-// Force DNS lookup to use Google DNS at the absolute entry point to bypass local OS bugs
-dns.setServers(['8.8.8.8', '8.8.4.4']);
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (e) {
+  // Ignore DNS set errors in serverless environments
+}
 
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import dotenv from 'dotenv';
@@ -12,14 +14,7 @@ const __dirname = dirname(__filename);
 
 dotenv.config({ path: resolve(__dirname, '..', '.env') });
 
-const uri = process.env.MONGODB_URI;
-
-let client;
-let clientPromise;
-
-if (!process.env.MONGODB_URI) {
-  throw new Error('Please add your Mongo URI to .env or environment variables');
-}
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/northstar_sprint';
 
 const options = {
   tls: true,

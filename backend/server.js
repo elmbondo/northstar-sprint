@@ -1,5 +1,9 @@
 import dns from 'dns';
-dns.setServers(['8.8.8.8', '8.8.4.4']);
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (e) {
+  // Ignore DNS set errors in serverless environments
+}
 
 import express from 'express';
 import cors from 'cors';
@@ -16,12 +20,6 @@ dotenv.config({ path: resolve(__dirname, '.env') });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://127.0.0.1:5173',
-  'http://127.0.0.1:5174',
-];
 
 // Import API route handlers
 import ordersHandler from './api/orders.js';
@@ -30,13 +28,7 @@ import { handleSignUp, handleSignIn, handleSignOut, handleMe } from './api/auth.
 
 app.use(express.json());
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-      return;
-    }
-    callback(new Error('Not allowed by CORS'));
-  },
+  origin: true,
   credentials: true,
 }));
 
