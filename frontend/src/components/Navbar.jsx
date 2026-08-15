@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Navbar({ currentPage, onNavigate }) {
+export default function Navbar({ currentPage, onNavigate, user, onSignOut }) {
   const items = [
     { key: 'home', label: 'Home' },
     { key: 'order-status', label: 'Order Status' },
@@ -41,13 +41,30 @@ export default function Navbar({ currentPage, onNavigate }) {
             ))}
           </nav>
 
-          <button
-            type="button"
-            onClick={() => onNavigate('sign-in')}
-            className="border border-brand-espresso/15 px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-brand-espresso hover:bg-brand-espresso hover:text-brand-cream transition-colors"
-          >
-            Sign In
-          </button>
+          <div className="flex items-center gap-3">
+            {user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-brand-espresso font-medium hidden sm:inline">
+                  Hi, {user.name}
+                </span>
+                <button
+                  type="button"
+                  onClick={onSignOut}
+                  className="border border-brand-espresso/15 px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-brand-espresso hover:bg-brand-espresso hover:text-brand-cream transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onNavigate('sign-in')}
+                className="border border-brand-espresso/15 px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-brand-espresso hover:bg-brand-espresso hover:text-brand-cream transition-colors"
+              >
+                Sign In
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </header>

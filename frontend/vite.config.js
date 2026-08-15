@@ -6,6 +6,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    // No proxy needed - frontend calls backend directly
+    proxy: {
+      '/api': {
+        target: process.env.VITE_API_BASE_URL || 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   }
 });

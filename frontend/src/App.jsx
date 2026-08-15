@@ -13,6 +13,24 @@ import SignUp from './pages/SignUp.jsx';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [user, setUser] = useState(null);
+
+  // Check existing session on initial load
+  useEffect(() => {
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw new Error('Not logged in');
+      })
+      .then((data) => {
+        if (data.success && data.user) {
+          setUser(data.user);
+        }
+      })
+      .catch(() => {
+        setUser(null);
+      });
+  }, []);
 
   // Handle browser tab title adjustments based on state changes
   useEffect(() => {
@@ -29,6 +47,22 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [currentPage]);
 
+  const handleSignOut = async () => {
+    try {
+      await fetch('/api/auth/signout', { method: 'POST', credentials: 'include' });
+    } catch (err) {
+      console.error('Failed to sign out:', err);
+    } finally {
+      setUser(null);
+      setCurrentPage('home');
+    }
+  };
+
+  const handleAuthSuccess = (userData) => {
+    setUser(userData);
+    setCurrentPage('home');
+  };
+
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
@@ -36,13 +70,13 @@ export default function App() {
       case 'order-status':
         return <OrderStatus onNavigate={setCurrentPage} />;
       case 'returns':
-        return <Returns onNavigate={setCurrentPage} />;
+        return <Returns onNavigate={setCurrentPage} user={user} />;
       case 'contact':
         return <Contact />;
       case 'sign-in':
-        return <SignIn onNavigate={setCurrentPage} />;
+        return <SignIn onNavigate={setCurrentPage} onAuthSuccess={handleAuthSuccess} />;
       case 'sign-up':
-        return <SignUp onNavigate={setCurrentPage} />;
+        return <SignUp onNavigate={setCurrentPage} onAuthSuccess={handleAuthSuccess} />;
       default:
         return <Home onNavigate={setCurrentPage} />;
     }
@@ -54,7 +88,7 @@ export default function App() {
       <AnnouncementBar />
 
       {/* Main Responsive Header */}
-      <Navbar currentPage={currentPage} onNavigate={setCurrentPage} />
+      <Navbar currentPage={currentPage} onNavigate={setCurrentPage} user={user} onSignOut={handleSignOut} />
 
       {/* Primary Page Canvas */}
       <main className="flex-grow">

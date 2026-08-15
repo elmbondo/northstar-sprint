@@ -73,6 +73,69 @@ Stores customer support interactions and system events.
 }
 ```
 
+### 3. **users**
+Stores registered client portal user accounts.
+
+**Fields:**
+```javascript
+{
+  _id: ObjectId,
+  email: String (unique, e.g., "customer@example.com"),
+  passwordHash: String (hashed via bcrypt),
+  name: String,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Indexes:**
+- Unique index on `email` (for fast lookups and login)
+
+**Example:**
+```javascript
+{
+  email: "eleanor@example.com",
+  passwordHash: "$2b$10$abcdefghijklmnopqrstuvw...",
+  name: "Eleanor Vance",
+  createdAt: new Date(),
+  updatedAt: new Date()
+}
+```
+
+### 4. **returns**
+Stores customer returns and refund status.
+
+**Fields:**
+```javascript
+{
+  _id: ObjectId,
+  email: String,
+  orderNumber: String,
+  productName: String,
+  status: String ("Refund Processed" | "In Transit" | "Reviewing"),
+  requestDate: String (YYYY-MM-DD),
+  refundAmount: String,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Indexes:**
+- Index on `email` (for fast lookups by user)
+
+**Example:**
+```javascript
+{
+  email: "eleanor@example.com",
+  orderNumber: "NS1001",
+  productName: "Classic Leather Tote",
+  status: "Refund Processed",
+  requestDate: "2026-08-10",
+  refundAmount: "$145.00",
+  createdAt: new Date(),
+  updatedAt: new Date()
+}
+```
 ## Connection
 
 **Environment Variable:**
