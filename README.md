@@ -1,5 +1,9 @@
 # Northstar Support Deflection MVP
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-success?style=for-the-badge&logo=vercel)](https://northstar-sprint-topaz.vercel.app/)
+
+> 🚀 **Live Production URL:** [https://northstar-sprint-topaz.vercel.app/](https://northstar-sprint-topaz.vercel.app/)
+
 ## Overview
 
 The Northstar Support Deflection MVP is a customer-facing self-service support application designed to reduce repetitive customer support tickets for the Northstar Retail Co. support team.
@@ -176,9 +180,8 @@ pnpm dev
 
 ## Deployment & Live Demo
 
-The application is deployed live via **Vercel**. 
-
-Since the project is live, anyone can test the full functionality using the **live Vercel link available on the right side of this GitHub repository** (under the "Deployments" or "Environments" section).
+The application is deployed live via **Vercel** at:
+👉 **[https://northstar-sprint-topaz.vercel.app/](https://northstar-sprint-topaz.vercel.app/)**
 
 - The `frontend/` directory is built natively by Vercel using the Vite preset.
 - The `backend/` Express server is wrapped by a serverless entry point at `api/index.js`.
