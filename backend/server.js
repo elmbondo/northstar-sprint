@@ -25,6 +25,7 @@ const PORT = process.env.PORT || 3000;
 import ordersHandler from './api/orders.js';
 import logsHandler from './api/logs.js';
 import { handleSignUp, handleSignIn, handleSignOut, handleMe } from './api/auth.js';
+import webhooksHandler from './api/webhooks.js';
 
 app.use(express.json());
 app.use(cors({
@@ -102,6 +103,16 @@ import returnsHandler from './api/returns.js';
 app.post('/api/returns', async (req, res) => {
   try {
     await returnsHandler(req, res);
+  } catch (err) {
+    console.error('API error:', err.message);
+    res.status(500).json({ success: false, message: 'API error: ' + err.message });
+  }
+});
+
+// Webhook receiver for inventory updates
+app.post('/api/webhooks/inventory', async (req, res) => {
+  try {
+    await webhooksHandler(req, res);
   } catch (err) {
     console.error('API error:', err.message);
     res.status(500).json({ success: false, message: 'API error: ' + err.message });
